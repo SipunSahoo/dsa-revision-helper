@@ -1,4 +1,3 @@
-// ── LEETCODE DATABASE LAYER (O(1) Hash Map) ──
 let leetcodeDB = {};
 
 async function initDatabase() {
@@ -6,11 +5,7 @@ async function initDatabase() {
     const res = await fetch('./leetcode-db.json');
     const data = await res.json();
     data.forEach(q => {
-      leetcodeDB[q.id] = {
-        name: q.title,
-        difficulty: q.difficulty,
-        patterns: q.patterns
-      };
+      leetcodeDB[q.id] = { name: q.title, difficulty: q.difficulty, patterns: q.patterns };
     });
     console.log("Database loaded into memory! Ready for O(1) lookups.");
   } catch (e) {
@@ -25,39 +20,36 @@ function lookupQuestion(id) {
   return leetcodeDB[numId];
 }
 
-// Adapter Pattern: Translates LeetCode's raw tags to match your UI <select> exact strings
 function mapLeetCodeTagsToUI(lcTags) {
   if (!lcTags || lcTags.length === 0) return [];
   
+  // We map everything to lowercase to ensure we never miss a pattern due to formatting
   const mapping = {
-    "Hash Table": "HashMap / Frequency",
-    "Stack": "Stack / Monotonic Stack",
-    "Monotonic Stack": "Stack / Monotonic Stack",
-    "Tree": "Trees",
-    "Binary Tree": "Trees",
-    "Graph": "Graphs",
-    "Heap (Priority Queue)": "Heap / Priority Queue"
+    "array": "Arrays / Strings", "string": "Arrays / Strings", "sorting": "Arrays / Strings", "matrix": "Arrays / Strings",
+    "hash table": "HashMap / Set", "hash function": "HashMap / Set",
+    "two pointers": "Two Pointers", "sliding window": "Sliding Window", "prefix sum": "Prefix Sum",
+    "binary search": "Binary Search", "linked list": "Linked List",
+    "stack": "Stack / Queue", "queue": "Stack / Queue", "monotonic stack": "Stack / Queue",
+    "tree": "Trees / BST", "binary tree": "Trees / BST", "binary search tree": "Trees / BST", "trie": "Trees / BST",
+    "graph": "Graphs / DFS / BFS", "depth-first search": "Graphs / DFS / BFS", "breadth-first search": "Graphs / DFS / BFS", "union find": "Graphs / DFS / BFS", "topological sort": "Graphs / DFS / BFS",
+    "heap (priority queue)": "Heap / PQ",
+    "dynamic programming": "Dynamic Programming", "backtracking": "Backtracking", "greedy": "Greedy",
+    "math": "Math / Bit", "bit manipulation": "Math / Bit", "geometry": "Math / Bit"
   };
 
-  const exactMatches = [
-    "Two Pointers", "Sliding Window", "Prefix Sum", 
-    "Binary Search", "Linked List", "Dynamic Programming", 
-    "Backtracking", "Greedy"
-  ];
-
-  // We use a Set to automatically eliminate duplicates
+  // Using a Set inherently removes duplicate mappings
   let result = new Set();
 
   for (let tag of lcTags) {
-    if (mapping[tag]) result.add(mapping[tag]);
-    else if (exactMatches.includes(tag)) result.add(tag);
+    let lowerTag = tag.toLowerCase();
+    if (mapping[lowerTag]) {
+      result.add(mapping[lowerTag]);
+    }
   }
   
-  // Convert the Set back to a standard Array for UI mapping
   return Array.from(result);
 }
 
-// ── DATE HELPERS ──
 function today() { return new Date().toISOString().split('T')[0]; }
 function addDays(dateStr, days) {
   const d = new Date(dateStr + 'T00:00:00');
@@ -65,18 +57,12 @@ function addDays(dateStr, days) {
   return d.toISOString().split('T')[0];
 }
 function generateSlug(name) {
-  return name.toLowerCase().trim()
-    .replace(/[^a-z0-9\s]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
+  return name.toLowerCase().trim().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
 }
 function lcUrl(slug) { return `https://leetcode.com/problems/${slug}/`; }
 
-// ── CRUD STATE MACHINE ──
 function addQuestion({ number, name, pattern, difficulty, status, notes = '' }) {
   const questions = getQuestions();
-  
   const isSolved = status === 'solved';
 
   const q = {
@@ -86,10 +72,9 @@ function addQuestion({ number, name, pattern, difficulty, status, notes = '' }) 
     slug:         generateSlug(name),
     pattern:      Array.isArray(pattern) ? pattern : [pattern],
     difficulty,
-    status:       status, // 'learning' or 'solved'
+    status:       status, 
     notes:        notes.trim().slice(0, 300),
     
-    // Engine Initialization: Only trigger timers if status is 'solved'
     attempts:     isSolved ? 1 : 0,
     lastSolved:   isSolved ? today() : null,
     lastRevised:  null,
@@ -112,7 +97,7 @@ function markAsSolved(id) {
   q.status       = 'solved';
   q.attempts    += 1;
   q.lastSolved   = today();
-  q.nextRevision = addDays(today(), 1); 
+  q.nextRevision = addDays(today(), 1);
   q.revisionCount = 0;
   q.lastUpdated  = new Date().toISOString();
   saveQuestions(questions);
@@ -153,12 +138,9 @@ function deleteQuestion(id) {
   saveQuestions(getQuestions().filter(q => q.id !== id));
 }
 
-// ── QUERIES ──
 function getDueToday() {
   const t = today();
-  return getQuestions().filter(
-    q => q.nextRevision && q.nextRevision <= t && q.status !== 'mastered'
-  );
+  return getQuestions().filter(q => q.nextRevision && q.nextRevision <= t && q.status !== 'mastered');
 }
 
 function getUpcoming() {

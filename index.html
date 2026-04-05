@@ -4,13 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DSA.Revise</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
+  <link href="[https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap](https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap)" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
     /* Small UI adjustment for the new multi-select layout */
     .form-grid {
       grid-template-columns: 80px 2fr 1fr 1fr;
+    }
+    #f-pattern[multiple] {
+      min-height: 80px; /* Makes the multi-select box taller */
     }
     @media (max-width: 580px) {
       .form-grid { grid-template-columns: 1fr 1fr; }
@@ -86,21 +89,23 @@
         <!-- ROW 2 -->
         <div class="fg fg-2">
           <label>Patterns</label>
-          <!-- Controlled UI: Custom Pills instead of native multi-select -->
+          <!-- Controlled UI for Multi-Select -->
           <div class="pattern-pills-container" id="f-pattern-container">
+            <button type="button" class="pattern-pill" data-val="Arrays / Strings">Arrays / Strings</button>
+            <button type="button" class="pattern-pill" data-val="HashMap / Set">HashMap / Set</button>
             <button type="button" class="pattern-pill" data-val="Two Pointers">Two Pointers</button>
             <button type="button" class="pattern-pill" data-val="Sliding Window">Sliding Window</button>
             <button type="button" class="pattern-pill" data-val="Prefix Sum">Prefix Sum</button>
             <button type="button" class="pattern-pill" data-val="Binary Search">Binary Search</button>
-            <button type="button" class="pattern-pill" data-val="HashMap / Frequency">HashMap / Frequency</button>
             <button type="button" class="pattern-pill" data-val="Linked List">Linked List</button>
-            <button type="button" class="pattern-pill" data-val="Stack / Monotonic Stack">Stack / Monotonic Stack</button>
-            <button type="button" class="pattern-pill" data-val="Trees">Trees</button>
-            <button type="button" class="pattern-pill" data-val="Graphs">Graphs</button>
-            <button type="button" class="pattern-pill" data-val="Heap / Priority Queue">Heap / Priority Queue</button>
+            <button type="button" class="pattern-pill" data-val="Stack / Queue">Stack / Queue</button>
+            <button type="button" class="pattern-pill" data-val="Trees / BST">Trees / BST</button>
+            <button type="button" class="pattern-pill" data-val="Graphs / DFS / BFS">Graphs / DFS / BFS</button>
+            <button type="button" class="pattern-pill" data-val="Heap / PQ">Heap / PQ</button>
             <button type="button" class="pattern-pill" data-val="Dynamic Programming">Dynamic Programming</button>
             <button type="button" class="pattern-pill" data-val="Backtracking">Backtracking</button>
             <button type="button" class="pattern-pill" data-val="Greedy">Greedy</button>
+            <button type="button" class="pattern-pill" data-val="Math / Bit">Math / Bit</button>
           </div>
         </div>
         <div class="fg fg-2">
@@ -136,13 +141,14 @@
         <div class="filters">
           <select id="filter-pattern">
             <option value="">All Patterns</option>
+            <option>Arrays / Strings</option><option>HashMap / Set</option>
             <option>Two Pointers</option><option>Sliding Window</option>
             <option>Prefix Sum</option><option>Binary Search</option>
-            <option>HashMap / Frequency</option><option>Linked List</option>
-            <option>Stack / Monotonic Stack</option><option>Trees</option>
-            <option>Graphs</option><option>Heap / Priority Queue</option>
-            <option>Dynamic Programming</option><option>Backtracking</option>
-            <option>Greedy</option>
+            <option>Linked List</option><option>Stack / Queue</option>
+            <option>Trees / BST</option><option>Graphs / DFS / BFS</option>
+            <option>Heap / PQ</option><option>Dynamic Programming</option>
+            <option>Backtracking</option><option>Greedy</option>
+            <option>Math / Bit</option>
           </select>
           <select id="filter-status">
             <option value="">All Status</option>
@@ -205,10 +211,8 @@
       </div>
       <div id="upcoming-empty" class="empty-state hidden">No upcoming revisions. Mark some questions as solved to start your revision cycle!</div>
     </div>
-
   </main>
 
-  <!-- Load Order is Critical -->
   <script src="Storage.js"></script>
   <script src="Logic.js"></script>
   <script src="Ui.js"></script>

@@ -176,7 +176,7 @@ body { background: var(--bg); color: var(--tx); font-family: var(--font); font-s
 
 .form-grid {
   display: grid;
-  grid-template-columns: 80px 2fr 1fr 1fr;
+  grid-template-columns: 80px 3fr 2fr 1fr;
   gap: 10px; align-items: start;
 }
 .fg-2 { grid-column: span 2; }

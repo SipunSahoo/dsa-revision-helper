@@ -4,23 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DSA.Revise</title>
-  <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
-  <link href="[https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap](https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap)" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Small UI adjustment for the new multi-select layout */
-    .form-grid {
-      grid-template-columns: 80px 2fr 1fr 1fr;
-    }
-    #f-pattern[multiple] {
-      min-height: 80px; /* Makes the multi-select box taller */
-    }
-    @media (max-width: 580px) {
-      .form-grid { grid-template-columns: 1fr 1fr; }
-    }
+    @media (max-width: 580px) { .form-grid { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
 <body>
+  
 
   <!-- INTRO -->
   <div id="intro-overlay">
@@ -33,185 +25,201 @@
     </div>
   </div>
 
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <span class="brand">DSA<span class="brand-dot">.</span>Revise</span>
-    <nav class="nav-tabs">
-      <button class="nav-tab active" data-section="home">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-        <span class="nav-label">Home</span>
-      </button>
-      <button class="nav-tab" data-section="all">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
-        <span class="nav-label">All Questions</span>
-      </button>
-      <button class="nav-tab" data-section="upcoming">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span class="nav-label">Upcoming</span>
-      </button>
-    </nav>
-    <button id="btn-add" class="btn btn-primary">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Add
-    </button>
-  </header>
-
-  <!-- ADD FORM -->
-  <div id="add-form-wrap" class="add-form-wrap hidden">
-    <div class="add-form-inner">
-      <div class="form-title">Add Question</div>
-      <div class="form-grid">
-        <!-- ROW 1 -->
-        <div class="fg">
-          <label>LC #</label>
-          <input type="number" id="f-number" placeholder="153" min="1">
-        </div>
-        <div class="fg">
-          <label>Problem Name</label>
-          <input type="text" id="f-name" placeholder="Find Minimum in Rotated Sorted Array">
-        </div>
-        <div class="fg">
-          <label>Difficulty</label>
-          <select id="f-diff">
-            <option value="">Select</option>
-            <option>Easy</option><option>Medium</option><option>Hard</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label>Status</label>
-          <select id="f-status">
-            <option value="learning">Learning (Unsolved)</option>
-            <!-- Default to Solved -->
-            <option value="solved" selected>Solved</option> 
-          </select>
-        </div>
-        
-        <!-- ROW 2 -->
-        <div class="fg fg-2">
-          <label>Patterns</label>
-          <!-- Controlled UI for Multi-Select -->
-          <div class="pattern-pills-container" id="f-pattern-container">
-            <button type="button" class="pattern-pill" data-val="Arrays / Strings">Arrays / Strings</button>
-            <button type="button" class="pattern-pill" data-val="HashMap / Set">HashMap / Set</button>
-            <button type="button" class="pattern-pill" data-val="Two Pointers">Two Pointers</button>
-            <button type="button" class="pattern-pill" data-val="Sliding Window">Sliding Window</button>
-            <button type="button" class="pattern-pill" data-val="Prefix Sum">Prefix Sum</button>
-            <button type="button" class="pattern-pill" data-val="Binary Search">Binary Search</button>
-            <button type="button" class="pattern-pill" data-val="Linked List">Linked List</button>
-            <button type="button" class="pattern-pill" data-val="Stack / Queue">Stack / Queue</button>
-            <button type="button" class="pattern-pill" data-val="Trees / BST">Trees / BST</button>
-            <button type="button" class="pattern-pill" data-val="Graphs / DFS / BFS">Graphs / DFS / BFS</button>
-            <button type="button" class="pattern-pill" data-val="Heap / PQ">Heap / PQ</button>
-            <button type="button" class="pattern-pill" data-val="Dynamic Programming">Dynamic Programming</button>
-            <button type="button" class="pattern-pill" data-val="Backtracking">Backtracking</button>
-            <button type="button" class="pattern-pill" data-val="Greedy">Greedy</button>
-            <button type="button" class="pattern-pill" data-val="Math / Bit">Math / Bit</button>
-          </div>
-        </div>
-        <div class="fg fg-2">
-          <label>Notes <em>(optional · max 300 chars)</em></label>
-          <textarea id="f-notes" rows="3" maxlength="300" placeholder="Approach, edge cases, mistakes to remember..."></textarea>
-        </div>
-      </div>
-      <div class="form-foot">
-        <button id="btn-submit" class="btn btn-primary">Add Question</button>
-        <button id="btn-cancel" class="btn btn-ghost">Cancel</button>
-      </div>
-    </div>
+  <!-- DETAIL MODAL -->
+  <div id="modal-backdrop" class="modal-backdrop hidden" onclick="handleBackdropClick(event)">
+    <div class="detail-modal" id="detail-modal"></div>
   </div>
 
-  <main>
-    <!-- HOME -->
-    <div id="section-home" class="page-section">
-      <div class="section-head">
-        <div class="section-title">Today's Revision <span id="due-count" class="pill">0</span></div>
-      </div>
-      <div id="due-list" class="due-grid"></div>
+  <div class="app-shell">
 
-      <div class="section-head" style="margin-top:36px">
-        <div class="section-title">Overview</div>
-      </div>
-      <div id="stats-row" class="stats-row"></div>
-    </div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">DSA<span class="sidebar-brand-dot">.</span>Revise</div>
 
-    <!-- ALL QUESTIONS -->
-    <div id="section-all" class="page-section hidden">
-      <div class="section-head">
-        <div class="section-title">All Questions <span id="total-count" class="pill">0</span></div>
-        <div class="filters">
-          <select id="filter-pattern">
-            <option value="">All Patterns</option>
-            <option>Arrays / Strings</option><option>HashMap / Set</option>
-            <option>Two Pointers</option><option>Sliding Window</option>
-            <option>Prefix Sum</option><option>Binary Search</option>
-            <option>Linked List</option><option>Stack / Queue</option>
-            <option>Trees / BST</option><option>Graphs / DFS / BFS</option>
-            <option>Heap / PQ</option><option>Dynamic Programming</option>
-            <option>Backtracking</option><option>Greedy</option>
-            <option>Math / Bit</option>
-          </select>
-          <select id="filter-status">
-            <option value="">All Status</option>
-            <option value="learning">Learning</option>
-            <option value="solved">Solved</option>
-            <option value="revising">Revising</option>
-            <option value="mastered">Mastered</option>
-          </select>
+      <div class="sidebar-section-lbl">Navigation</div>
+
+      <button class="snav-item active" data-section="home">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        <span class="snav-label">Home</span>
+      </button>
+      <button class="snav-item" data-section="all">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
+        <span class="snav-label">All Questions</span>
+      </button>
+      <button class="snav-item" data-section="upcoming">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="snav-label">Upcoming Revisions</span>
+      </button>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="sidebar-add-wrap">
+        <button id="btn-add" class="btn btn-cta">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Question
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAP -->
+    <div class="main-wrap">
+
+      <!-- ADD FORM -->
+      <div id="add-form-wrap" class="add-form-wrap hidden">
+        <div class="add-form-inner">
+          <div class="form-title">Add Question</div>
+          <div class="form-grid">
+            <div class="fg">
+              <label>LC #</label>
+              <input type="number" id="f-number" placeholder="153" min="1">
+            </div>
+            <div class="fg">
+              <label>Problem Name</label>
+              <input type="text" id="f-name" placeholder="Find Minimum in Rotated Sorted Array">
+            </div>
+            <div class="fg">
+              <label>Difficulty</label>
+              <select id="f-diff">
+                <option value="">Select</option>
+                <option>Easy</option><option>Medium</option><option>Hard</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Status</label>
+              <select id="f-status">
+                <option value="learning">Learning (Unsolved)</option>
+                <option value="solved" selected>Solved</option>
+              </select>
+            </div>
+            <div class="fg fg-2">
+              <label>Patterns</label>
+              <div class="pattern-pills-container" id="f-pattern-container">
+                <button type="button" class="pattern-pill" data-val="Arrays / Strings">Arrays / Strings</button>
+                <button type="button" class="pattern-pill" data-val="HashMap / Set">HashMap / Set</button>
+                <button type="button" class="pattern-pill" data-val="Two Pointers">Two Pointers</button>
+                <button type="button" class="pattern-pill" data-val="Sliding Window">Sliding Window</button>
+                <button type="button" class="pattern-pill" data-val="Prefix Sum">Prefix Sum</button>
+                <button type="button" class="pattern-pill" data-val="Binary Search">Binary Search</button>
+                <button type="button" class="pattern-pill" data-val="Linked List">Linked List</button>
+                <button type="button" class="pattern-pill" data-val="Stack / Queue">Stack / Queue</button>
+                <button type="button" class="pattern-pill" data-val="Trees / BST">Trees / BST</button>
+                <button type="button" class="pattern-pill" data-val="Graphs / DFS / BFS">Graphs / DFS / BFS</button>
+                <button type="button" class="pattern-pill" data-val="Heap / PQ">Heap / PQ</button>
+                <button type="button" class="pattern-pill" data-val="Dynamic Programming">Dynamic Programming</button>
+                <button type="button" class="pattern-pill" data-val="Backtracking">Backtracking</button>
+                <button type="button" class="pattern-pill" data-val="Greedy">Greedy</button>
+                <button type="button" class="pattern-pill" data-val="Math / Bit">Math / Bit</button>
+              </div>
+            </div>
+            <div class="fg fg-2">
+              <label>Notes <em>(optional · max 600 chars)</em></label>
+              <textarea id="f-notes" rows="3" maxlength="600" placeholder="Approach, edge cases, mistakes to remember..."></textarea>
+            </div>
+          </div>
+          <div class="form-foot">
+            <button id="btn-submit" class="btn btn-primary">Add Question</button>
+            <button id="btn-cancel" class="btn btn-ghost">Cancel</button>
+          </div>
         </div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th class="col-num">#</th>
-              <th>Name</th>
-              <th class="hide-sm">Pattern(s)</th>
-              <th class="hide-sm">Diff</th>
-              <th>Status</th>
-              <th class="hide-md">Added</th>
-              <th class="hide-md">Last Solved</th>
-              <th class="hide-md">Next Rev</th>
-              <th class="col-act"></th>
-            </tr>
-          </thead>
-          <tbody id="all-tbody"></tbody>
-        </table>
-      </div>
-      <div id="all-empty" class="empty-state hidden">No questions found.</div>
-    </div>
 
-    <!-- UPCOMING REVISIONS -->
-    <div id="section-upcoming" class="page-section hidden">
-      <div class="section-head">
-        <div class="section-title">Upcoming Revisions <span id="upcoming-count" class="pill">0</span></div>
-        <div class="legend-row">
-          <span class="legend-chip chip-overdue">&#9679; Overdue</span>
-          <span class="legend-chip chip-today">&#9679; Due Today</span>
-          <span class="legend-chip chip-future">&#9679; Scheduled</span>
+      <main>
+        <!-- HOME -->
+        <div id="section-home" class="page-section">
+          <div class="section-head">
+            <div class="section-title">Overview</div>
+          </div>
+          <div id="stats-row" class="stats-row"></div>
+
+          <div class="section-head" style="margin-top:36px">
+            <div class="section-title">Today's Revision <span id="due-count" class="pill">0</span></div>
+          </div>
+          <div id="due-list" class="due-grid"></div>
         </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead class="thead-sticky">
-            <tr>
-              <th class="col-num">#</th>
-              <th>Name</th>
-              <th class="hide-sm">Pattern(s)</th>
-              <th class="hide-sm">Diff</th>
-              <th>Status</th>
-              <th class="hide-md">Created</th>
-              <th class="hide-md">Last Solved</th>
-              <th class="hide-md">Last Revised</th>
-              <th>Next Revision</th>
-              <th class="col-act"></th>
-            </tr>
-          </thead>
-          <tbody id="upcoming-tbody"></tbody>
-        </table>
-      </div>
-      <div id="upcoming-empty" class="empty-state hidden">No upcoming revisions. Mark some questions as solved to start your revision cycle!</div>
-    </div>
-  </main>
+
+        <!-- ALL QUESTIONS -->
+        <div id="section-all" class="page-section hidden">
+          <div class="section-head">
+            <div class="section-title">All Questions <span id="total-count" class="pill">0</span></div>
+            <div class="filters">
+              <select id="filter-pattern">
+                <option value="">All Patterns</option>
+                <option>Arrays / Strings</option><option>HashMap / Set</option>
+                <option>Two Pointers</option><option>Sliding Window</option>
+                <option>Prefix Sum</option><option>Binary Search</option>
+                <option>Linked List</option><option>Stack / Queue</option>
+                <option>Trees / BST</option><option>Graphs / DFS / BFS</option>
+                <option>Heap / PQ</option><option>Dynamic Programming</option>
+                <option>Backtracking</option><option>Greedy</option>
+                <option>Math / Bit</option>
+              </select>
+              <select id="filter-status">
+                <option value="">All Status</option>
+                <option value="learning">Learning</option>
+                <option value="solved">Solved</option>
+                <option value="revising">Revising</option>
+                <option value="mastered">Mastered</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-num">#</th>
+                  <th>Name</th>
+                  <th class="hide-sm">Pattern(s)</th>
+                  <th class="hide-sm">Diff</th>
+                  <th>Status</th>
+                  <th class="hide-md">Added</th>
+                  <th class="hide-md">Last Solved</th>
+                  <th class="hide-md">Next Rev</th>
+                  <th class="col-act"></th>
+                </tr>
+              </thead>
+              <tbody id="all-tbody"></tbody>
+            </table>
+          </div>
+          <div id="all-empty" class="empty-state hidden">No questions found.</div>
+        </div>
+
+        <!-- UPCOMING REVISIONS -->
+        <div id="section-upcoming" class="page-section hidden">
+          <div class="section-head">
+            <div class="section-title">Upcoming Revisions <span id="upcoming-count" class="pill">0</span></div>
+            <div class="legend-row">
+              <span class="legend-chip chip-overdue">&#9679; Overdue</span>
+              <span class="legend-chip chip-today">&#9679; Due Today</span>
+              <span class="legend-chip chip-future">&#9679; Scheduled</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead class="thead-sticky">
+                <tr>
+                  <th class="col-num">#</th>
+                  <th>Name</th>
+                  <th class="hide-sm">Pattern(s)</th>
+                  <th class="hide-sm">Diff</th>
+                  <th>Status</th>
+                  <th class="hide-md">Created</th>
+                  <th class="hide-md">Last Solved</th>
+                  <th class="hide-md">Last Revised</th>
+                  <th>Next Revision</th>
+                  <th class="col-act"></th>
+                </tr>
+              </thead>
+              <tbody id="upcoming-tbody"></tbody>
+            </table>
+          </div>
+          <div id="upcoming-empty" class="empty-state hidden">No upcoming revisions. Mark some questions as solved to start your revision cycle!</div>
+        </div>
+      </main>
+      <footer class="global-footer">
+        <p>Track &middot; Revise &middot; Master</p>
+      </footer>
+    </div><!-- end .main-wrap -->
+  </div><!-- end .app-shell -->
 
   <script src="Storage.js"></script>
   <script src="Logic.js"></script>

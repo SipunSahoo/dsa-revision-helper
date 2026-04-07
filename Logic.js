@@ -22,8 +22,6 @@ function lookupQuestion(id) {
 
 function mapLeetCodeTagsToUI(lcTags) {
   if (!lcTags || lcTags.length === 0) return [];
-  
-  // We map everything to lowercase to ensure we never miss a pattern due to formatting
   const mapping = {
     "array": "Arrays / Strings", "string": "Arrays / Strings", "sorting": "Arrays / Strings", "matrix": "Arrays / Strings",
     "hash table": "HashMap / Set", "hash function": "HashMap / Set",
@@ -36,17 +34,11 @@ function mapLeetCodeTagsToUI(lcTags) {
     "dynamic programming": "Dynamic Programming", "backtracking": "Backtracking", "greedy": "Greedy",
     "math": "Math / Bit", "bit manipulation": "Math / Bit", "geometry": "Math / Bit"
   };
-
-  // Using a Set inherently removes duplicate mappings
   let result = new Set();
-
   for (let tag of lcTags) {
     let lowerTag = tag.toLowerCase();
-    if (mapping[lowerTag]) {
-      result.add(mapping[lowerTag]);
-    }
+    if (mapping[lowerTag]) result.add(mapping[lowerTag]);
   }
-  
   return Array.from(result);
 }
 
@@ -72,8 +64,8 @@ function addQuestion({ number, name, pattern, difficulty, status, notes = '' }) 
     slug:         generateSlug(name),
     pattern:      Array.isArray(pattern) ? pattern : [pattern],
     difficulty,
-    status:       status, 
-    notes:        notes.trim().slice(0, 300),
+    status:       status,
+    notes:        notes.trim().slice(0, 600), // Task 2: increased capacity
     
     attempts:     isSolved ? 1 : 0,
     lastSolved:   isSolved ? today() : null,
@@ -116,7 +108,7 @@ function markRevisionDone(id) {
   
   if (q.revisionCount >= 4) {
     q.status       = 'mastered';
-    q.nextRevision = null; 
+    q.nextRevision = null;
   } else {
     q.status       = 'revising';
     q.nextRevision = addDays(today(), intervals[q.revisionCount - 1] || 7);
@@ -129,7 +121,7 @@ function updateNotes(id, notes) {
   const questions = getQuestions();
   const q = questions.find(q => q.id === id);
   if (!q) return;
-  q.notes       = notes.slice(0, 300);
+  q.notes       = notes.slice(0, 600); // Task 2: increased capacity
   q.lastUpdated = new Date().toISOString();
   saveQuestions(questions);
 }

@@ -15,8 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Intro animation exit
   setTimeout(() => {
     const overlay = document.getElementById('intro-overlay');
-    overlay.classList.add('exit');
-    setTimeout(() => overlay.remove(), 550);
+    if (overlay) {
+      overlay.classList.add('exit');
+      setTimeout(() => overlay.remove(), 550);
+    }
   }, 2000);
 
   // Navigation
@@ -53,30 +55,33 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   document.getElementById('f-number').addEventListener('input', (e) => {
     const currentInput = e.target.value;
-    const questionData = lookupQuestion(currentInput);
-    
-    if (questionData) {
-      document.getElementById('f-name').value = questionData.name;
+    // Safety check ensuring Logic.js is loaded
+    if (typeof lookupQuestion === 'function') {
+      const questionData = lookupQuestion(currentInput);
       
-      if (questionData.difficulty) {
-        document.getElementById('f-diff').value = questionData.difficulty;
-      }
-      
-      // Auto-Fill Multi-Select Pills
-      const mappedPatterns = mapLeetCodeTagsToUI(questionData.patterns);
-      
-      // 1. Clear current state entirely
-      selectedPatternsSet.clear();
-      
-      // 2. Loop through DOM elements and toggle UI + State based on mapping
-      document.querySelectorAll('.pattern-pill').forEach(pill => {
-        if (mappedPatterns.includes(pill.dataset.val)) {
-          pill.classList.add('active');
-          selectedPatternsSet.add(pill.dataset.val);
-        } else {
-          pill.classList.remove('active');
+      if (questionData) {
+        document.getElementById('f-name').value = questionData.name;
+        
+        if (questionData.difficulty) {
+          document.getElementById('f-diff').value = questionData.difficulty;
         }
-      });
+        
+        // Auto-Fill Multi-Select Pills
+        const mappedPatterns = mapLeetCodeTagsToUI(questionData.patterns);
+        
+        // 1. Clear current state entirely
+        selectedPatternsSet.clear();
+        
+        // 2. Loop through DOM elements and toggle UI + State based on mapping
+        document.querySelectorAll('.pattern-pill').forEach(pill => {
+          if (mappedPatterns.includes(pill.dataset.val)) {
+            pill.classList.add('active');
+            selectedPatternsSet.add(pill.dataset.val);
+          } else {
+            pill.classList.remove('active');
+          }
+        });
+      }
     }
   });
 
@@ -98,6 +103,7 @@ function esc(s) {
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
 function fmt(iso) {
   if (!iso) return '—';
   return iso.split('T')[0];
@@ -106,6 +112,14 @@ function fmt(iso) {
 function formatPatterns(patternData) {
   if (!patternData || patternData.length === 0) return 'None';
   return Array.isArray(patternData) ? patternData.join(', ') : patternData;
+}
+
+function getStatusLabel(q) {
+  if (q.status === 'learning') return 'Learning';
+  if (q.status === 'solved') return 'Solved';
+  if (q.status === 'revising') return `Rev ${q.revisionCount} Done`;
+  if (q.status === 'mastered') return 'Mastered';
+  return q.status;
 }
 
 // ── NAVIGATION ──
@@ -139,6 +153,7 @@ function toggleForm() {
     closeForm();
   }
 }
+
 function closeForm() {
   document.getElementById('add-form-wrap').classList.add('hidden');
   
@@ -218,19 +233,55 @@ function renderDueToday() {
     <div class="due-card" style="animation-delay:${i * 0.04}s">
       <div class="dc-num">#${q.number}</div>
       <div class="dc-name">${esc(q.name)}</div>
-      <div class="dc-meta">${esc(formatPatterns(q.pattern))} · ${q.difficulty} · Revision ${q.revisionCount + 1}/4</div>
-      <div class="dc-notes" id="dcn-${q.id}">${esc(q.notes) || '<em>No notes added.</em>'}</div>
+      <div class="dc-meta"><span class="badge badge-${q.status}">${getStatusLabel(q)}</span> · ${q.difficulty}</div>
+      
+      <!-- ENGINEERED HTML WRAPPER: Essential for the 0fr to 1fr CSS transition -->
+      <div class="dc-notes-wrapper" id="dcn-${q.id}">
+        <div class="dc-notes-inner">
+          <div class="dc-notes">
+            <div class="dc-section">
+              <span class="dc-label">Patterns</span>
+              <span style="color: var(--accent); font-family: var(--mono); font-size: 11.5px;">${esc(formatPatterns(q.pattern))}</span>
+            </div>
+            
+            <div class="dc-section">
+              <span class="dc-label">Notes</span>
+              <span style="color: var(--tx);">${esc(q.notes) || '<em style="color: var(--tx-3);">No notes added.</em>'}</span>
+            </div>
+
+            <div class="detail-stats" style="margin-top: 12px; border-top: 1px dashed var(--bd); padding-top: 12px;">
+              <div class="ds">Attempts: <span style="color: var(--tx);">${q.attempts}</span></div>
+              <div class="ds">Last Solved: <span style="color: var(--tx);">${q.lastSolved || '—'}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="dc-actions">
-        <button class="btn btn-sm btn-ghost"   onclick="toggleDcNotes('${q.id}')">Notes</button>
+        <button class="btn btn-sm btn-ghost" onclick="toggleDcNotes('${q.id}')">Details</button>
         <button class="btn btn-sm btn-success" onclick="doRevDone('${q.id}', 'home')">Mark Done</button>
-        <a class="btn btn-sm btn-blue" href="${lcUrl(q.slug)}" target="_blank" rel="noopener">Open LC ↗</a>
+        <a class="btn btn-sm btn-blue" href="${typeof lcUrl !== 'undefined' ? lcUrl(q.slug) : '#'}" target="_blank" rel="noopener">Open LC ↗</a>
       </div>
     </div>
   `).join('');
 }
 
+// Accordion toggle logic
 function toggleDcNotes(id) {
-  document.getElementById('dcn-' + id).classList.toggle('open');
+  const target = document.getElementById('dcn-' + id);
+  if (!target) return;
+
+  const isOpening = !target.classList.contains('open');
+
+  // Close all open drawers first to keep the UI strictly an accordion
+  document.querySelectorAll('.dc-notes-wrapper.open').forEach(el => {
+    el.classList.remove('open');
+  });
+
+  // Open the clicked one if it wasn't already open
+  if (isOpening) {
+    target.classList.add('open');
+  }
 }
 
 // ── ALL QUESTIONS TABLE ──
@@ -264,18 +315,23 @@ function buildAllRow(q) {
       <td class="td-name"><i class="exp-icon">▶</i>${esc(q.name)}</td>
       <td class="hide-sm" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;" title="${esc(formatPatterns(q.pattern))}">${esc(formatPatterns(q.pattern))}</td>
       <td class="hide-sm"><span class="diff-${q.difficulty.toLowerCase()}">${q.difficulty}</span></td>
-      <td><span class="badge badge-${q.status}">${q.status}</span></td>
+      <td><span class="badge badge-${q.status}">${getStatusLabel(q)}</span></td>
       <td class="td-date hide-md">${fmt(q.createdAt)}</td>
       <td class="td-date hide-md">${q.lastSolved || '—'}</td>
       <td class="td-date hide-md">${nextDisp}</td>
       <td class="td-acts" onclick="event.stopPropagation()">
-        <a class="btn btn-sm btn-blue" href="${lcUrl(q.slug)}" target="_blank" rel="noopener" title="LeetCode">LC</a>
+        <a class="btn btn-sm btn-blue" href="${typeof lcUrl !== 'undefined' ? lcUrl(q.slug) : '#'}" target="_blank" rel="noopener" title="LeetCode">LC</a>
       </td>
     </tr>
     <tr class="detail-row ${isOpen ? 'open' : ''}">
       <td colspan="9">
         <div class="detail-grid">
           <div>
+            <div class="detail-notes-lbl" style="margin-bottom: 4px;">Full Patterns</div>
+            <div style="font-family: var(--mono); font-size: 11.5px; color: var(--accent); margin-bottom: 12px;">
+              ${esc(formatPatterns(q.pattern))}
+            </div>
+
             <div class="detail-notes-lbl">Notes</div>
             <textarea class="detail-notes-ta" id="ni-${q.id}" maxlength="300" rows="3"
               onblur="doNotesBlur('${q.id}')"
@@ -290,7 +346,7 @@ function buildAllRow(q) {
           <div class="detail-btns" onclick="event.stopPropagation()">
             ${q.status !== 'mastered' ? `<button class="btn btn-sm btn-success" onclick="doSolved('${q.id}', 'all')">Mark Solved</button>` : ''}
             ${canRev ? `<button class="btn btn-sm btn-yellow" onclick="doRevDone('${q.id}', 'all')">Rev Done</button>` : ''}
-            <a class="btn btn-sm btn-blue" href="${lcUrl(q.slug)}" target="_blank" rel="noopener">Open LC ↗</a>
+            <a class="btn btn-sm btn-blue" href="${typeof lcUrl !== 'undefined' ? lcUrl(q.slug) : '#'}" target="_blank" rel="noopener">Open LC ↗</a>
             <button class="btn btn-sm btn-danger" onclick="doDelete('${q.id}', 'all')">Delete</button>
           </div>
         </div>
@@ -324,7 +380,7 @@ function renderUpcoming() {
 }
 
 function buildUpcomingRow(q) {
-  const t = today();
+  const t = typeof today === 'function' ? today() : new Date().toISOString().split('T')[0];
   const isOpen = expandedUpId === q.id;
   const isOverdue = q.nextRevision < t;
   const isToday   = q.nextRevision === t;
@@ -342,7 +398,7 @@ function buildUpcomingRow(q) {
       <td class="td-name"><i class="exp-icon">▶</i>${esc(q.name)}</td>
       <td class="hide-sm" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;" title="${esc(formatPatterns(q.pattern))}">${esc(formatPatterns(q.pattern))}</td>
       <td class="hide-sm"><span class="diff-${q.difficulty.toLowerCase()}">${q.difficulty}</span></td>
-      <td><span class="badge badge-${q.status}">${q.status}</span></td>
+      <td><span class="badge badge-${q.status}">${getStatusLabel(q)}</span></td>
       <td class="td-date hide-md">${fmt(q.createdAt)}</td>
       <td class="td-date hide-md">${q.lastSolved || '—'}</td>
       <td class="td-date hide-md">${q.lastRevised || '—'}</td>
@@ -355,6 +411,11 @@ function buildUpcomingRow(q) {
       <td colspan="10">
         <div class="detail-grid">
           <div>
+            <div class="detail-notes-lbl" style="margin-bottom: 4px;">Full Patterns</div>
+            <div style="font-family: var(--mono); font-size: 11.5px; color: var(--accent); margin-bottom: 12px;">
+              ${esc(formatPatterns(q.pattern))}
+            </div>
+
             <div class="detail-notes-lbl">Notes</div>
             <textarea class="detail-notes-ta" id="ui-${q.id}" maxlength="300" rows="3"
               onblur="doNotesBlur('${q.id}')"
@@ -368,7 +429,7 @@ function buildUpcomingRow(q) {
           <div class="detail-btns" onclick="event.stopPropagation()">
             ${q.status !== 'mastered' ? `<button class="btn btn-sm btn-success" onclick="doSolved('${q.id}', 'upcoming')">Mark Solved</button>` : ''}
             ${canRev ? `<button class="btn btn-sm btn-yellow" onclick="doRevDone('${q.id}', 'upcoming')">Rev Done</button>` : ''}
-            <a class="btn btn-sm btn-blue" href="${lcUrl(q.slug)}" target="_blank" rel="noopener">Open LC ↗</a>
+            <a class="btn btn-sm btn-blue" href="${typeof lcUrl !== 'undefined' ? lcUrl(q.slug) : '#'}" target="_blank" rel="noopener">Open LC ↗</a>
             <button class="btn btn-sm btn-danger" onclick="doDelete('${q.id}', 'upcoming')">Delete</button>
           </div>
         </div>

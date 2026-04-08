@@ -2,17 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>DSA.Revise</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <style>
-    @media (max-width: 580px) { .form-grid { grid-template-columns: 1fr 1fr; } }
-  </style>
 </head>
 <body>
-  
 
   <!-- INTRO -->
   <div id="intro-overlay">
@@ -25,57 +21,102 @@
     </div>
   </div>
 
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- CUSTOM DELETE CONFIRM -->
+  <div id="delete-confirm-overlay" class="delete-confirm-overlay hidden" onclick="handleDeleteOverlayClick(event)">
+    <div class="delete-confirm-box">
+      <div class="dcb-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+      </div>
+      <div class="dcb-title">Delete question?</div>
+      <div class="dcb-name" id="dcb-name-display"></div>
+      <p class="dcb-sub">This will permanently remove it and all revision history.</p>
+      <div class="dcb-actions">
+        <button class="btn btn-ghost" onclick="cancelDelete()">Cancel</button>
+        <button class="btn btn-danger-solid" id="dcb-confirm-btn" onclick="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <!-- DETAIL MODAL -->
   <div id="modal-backdrop" class="modal-backdrop hidden" onclick="handleBackdropClick(event)">
     <div class="detail-modal" id="detail-modal"></div>
   </div>
 
+  <!-- IMPORT FILE INPUT (hidden) -->
+  <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImportFile(event)">
+
   <div class="app-shell">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="sidebar-brand">DSA<span class="sidebar-brand-dot">.</span>Revise</div>
+    <!-- SIDEBAR (desktop + tablet) -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-brand">DSA<span class="dot">.</span>Revise</div>
+        <div class="sidebar-tagline">Track · Revise · Master</div>
+      </div>
 
-      <div class="sidebar-section-lbl">Navigation</div>
-
-      <button class="snav-item active" data-section="home">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-        <span class="snav-label">Home</span>
-      </button>
-      <button class="snav-item" data-section="all">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
-        <span class="snav-label">All Questions</span>
-      </button>
-      <button class="snav-item" data-section="upcoming">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span class="snav-label">Upcoming Revisions</span>
-      </button>
-
-      <div class="sidebar-spacer"></div>
-
-      <div class="sidebar-add-wrap">
-        <button id="btn-add" class="btn btn-cta">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Question
+      <div class="sidebar-nav">
+        <div class="sidebar-section-lbl">Navigation</div>
+        <button class="snav-item active" data-section="home">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="snav-label">Home</span>
+        </button>
+        <button class="snav-item" data-section="all">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
+          <span class="snav-label">All Questions</span>
+        </button>
+        <button class="snav-item" data-section="upcoming">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="snav-label">Upcoming Revisions</span>
         </button>
       </div>
+
+      <div class="sidebar-footer">
+        <button id="btn-add" class="btn btn-cta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Question
+        </button>
+        <div class="sidebar-data-btns">
+          <button class="btn btn-data" onclick="exportData(); showToast('Backup downloaded.', 'success')" title="Export all data as JSON">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+          <button class="btn btn-data" onclick="document.getElementById('import-file-input').click()" title="Import from JSON backup">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Import
+          </button>
+        </div>
+      </div>
     </aside>
+
+    <!-- MOBILE TOP BAR -->
+    <header class="mobile-topbar">
+      <div class="mobile-brand">DSA<span class="dot">.</span>Revise</div>
+      <button id="mobile-add-trigger" class="mobile-add-icon" aria-label="Add question">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </header>
 
     <!-- MAIN WRAP -->
     <div class="main-wrap">
 
-      <!-- ADD FORM -->
+      <!-- ADD / EDIT FORM -->
       <div id="add-form-wrap" class="add-form-wrap hidden">
         <div class="add-form-inner">
-          <div class="form-title">Add Question</div>
+          <div class="form-header">
+            <span class="form-title" id="form-title-text">Add Question</span>
+            <span class="form-mode-badge" id="form-mode-badge" style="display:none">Editing</span>
+          </div>
           <div class="form-grid">
             <div class="fg">
               <label>LC #</label>
-              <input type="number" id="f-number" placeholder="153" min="1">
+              <input type="number" id="f-number" placeholder="153" min="1" autocomplete="off">
             </div>
             <div class="fg">
               <label>Problem Name</label>
-              <input type="text" id="f-name" placeholder="Find Minimum in Rotated Sorted Array">
+              <input type="text" id="f-name" placeholder="Find Minimum in Rotated Sorted Array" autocomplete="off">
             </div>
             <div class="fg">
               <label>Difficulty</label>
@@ -84,7 +125,7 @@
                 <option>Easy</option><option>Medium</option><option>Hard</option>
               </select>
             </div>
-            <div class="fg">
+            <div class="fg" id="f-status-wrap">
               <label>Status</label>
               <select id="f-status">
                 <option value="learning">Learning (Unsolved)</option>
@@ -92,7 +133,7 @@
               </select>
             </div>
             <div class="fg fg-2">
-              <label>Patterns</label>
+              <label>Patterns <em>(select all that apply)</em></label>
               <div class="pattern-pills-container" id="f-pattern-container">
                 <button type="button" class="pattern-pill" data-val="Arrays / Strings">Arrays / Strings</button>
                 <button type="button" class="pattern-pill" data-val="HashMap / Set">HashMap / Set</button>
@@ -113,17 +154,26 @@
             </div>
             <div class="fg fg-2">
               <label>Notes <em>(optional · max 600 chars)</em></label>
-              <textarea id="f-notes" rows="3" maxlength="600" placeholder="Approach, edge cases, mistakes to remember..."></textarea>
+              <textarea id="f-notes" rows="3" maxlength="600" placeholder="Approach, edge cases, patterns to remember..."></textarea>
             </div>
           </div>
           <div class="form-foot">
             <button id="btn-submit" class="btn btn-primary">Add Question</button>
-            <button id="btn-cancel" class="btn btn-ghost">Cancel</button>
+            <button id="btn-cancel" class="btn btn-ghost" onclick="closeForm()">Cancel</button>
           </div>
         </div>
       </div>
 
-      <main>
+      <!-- TOPBAR: back button + section breadcrumb -->
+      <div class="content-topbar" id="content-topbar">
+        <button id="btn-back" class="btn-back hidden" onclick="goBack()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+      </div>
+
+      <main id="main-content">
+
         <!-- HOME -->
         <div id="section-home" class="page-section">
           <div class="section-head">
@@ -131,8 +181,14 @@
           </div>
           <div id="stats-row" class="stats-row"></div>
 
-          <div class="section-head" style="margin-top:36px">
-            <div class="section-title">Today's Revision <span id="due-count" class="pill">0</span></div>
+          <div class="section-head" style="margin-top: 40px">
+            <div class="section-title">
+              Today's Revision
+              <span id="due-count" class="pill">0</span>
+            </div>
+            <button id="mark-all-btn" class="btn btn-sm btn-yellow hidden" onclick="handleMarkAllDue()">
+              Mark All Done ✓
+            </button>
           </div>
           <div id="due-list" class="due-grid"></div>
         </div>
@@ -141,6 +197,12 @@
         <div id="section-all" class="page-section hidden">
           <div class="section-head">
             <div class="section-title">All Questions <span id="total-count" class="pill">0</span></div>
+          </div>
+          <div class="table-controls">
+            <div class="search-wrap">
+              <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="search-all" class="search-input" placeholder="Search by name or LC #...">
+            </div>
             <div class="filters">
               <select id="filter-pattern">
                 <option value="">All Patterns</option>
@@ -150,8 +212,7 @@
                 <option>Linked List</option><option>Stack / Queue</option>
                 <option>Trees / BST</option><option>Graphs / DFS / BFS</option>
                 <option>Heap / PQ</option><option>Dynamic Programming</option>
-                <option>Backtracking</option><option>Greedy</option>
-                <option>Math / Bit</option>
+                <option>Backtracking</option><option>Greedy</option><option>Math / Bit</option>
               </select>
               <select id="filter-status">
                 <option value="">All Status</option>
@@ -166,21 +227,24 @@
             <table>
               <thead>
                 <tr>
-                  <th class="col-num">#</th>
-                  <th>Name</th>
+                  <th class="col-num sortable" data-sort="number" data-table="all"># <span class="sort-arrow"></span></th>
+                  <th class="sortable" data-sort="name" data-table="all">Name <span class="sort-arrow"></span></th>
                   <th class="hide-sm">Pattern(s)</th>
-                  <th class="hide-sm">Diff</th>
-                  <th>Status</th>
-                  <th class="hide-md">Added</th>
+                  <th class="hide-sm sortable" data-sort="difficulty" data-table="all">Diff <span class="sort-arrow"></span></th>
+                  <th class="sortable" data-sort="status" data-table="all">Status <span class="sort-arrow"></span></th>
+                  <th class="hide-md sortable" data-sort="createdAt" data-table="all">Added <span class="sort-arrow"></span></th>
                   <th class="hide-md">Last Solved</th>
-                  <th class="hide-md">Next Rev</th>
+                  <th class="hide-md sortable" data-sort="nextRevision" data-table="all">Next Rev <span class="sort-arrow"></span></th>
                   <th class="col-act"></th>
                 </tr>
               </thead>
               <tbody id="all-tbody"></tbody>
             </table>
           </div>
-          <div id="all-empty" class="empty-state hidden">No questions found.</div>
+          <div id="all-empty" class="empty-state hidden">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <p>No questions match your filters.</p>
+          </div>
         </div>
 
         <!-- UPCOMING REVISIONS -->
@@ -189,37 +253,64 @@
             <div class="section-title">Upcoming Revisions <span id="upcoming-count" class="pill">0</span></div>
             <div class="legend-row">
               <span class="legend-chip chip-overdue">&#9679; Overdue</span>
-              <span class="legend-chip chip-today">&#9679; Due Today</span>
+              <span class="legend-chip chip-today">&#9679; Today</span>
               <span class="legend-chip chip-future">&#9679; Scheduled</span>
+            </div>
+          </div>
+          <div class="table-controls">
+            <div class="search-wrap">
+              <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="search-upcoming" class="search-input" placeholder="Search upcoming...">
             </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead class="thead-sticky">
                 <tr>
-                  <th class="col-num">#</th>
-                  <th>Name</th>
+                  <th class="col-num sortable" data-sort="number" data-table="upcoming"># <span class="sort-arrow"></span></th>
+                  <th class="sortable" data-sort="name" data-table="upcoming">Name <span class="sort-arrow"></span></th>
                   <th class="hide-sm">Pattern(s)</th>
                   <th class="hide-sm">Diff</th>
                   <th>Status</th>
                   <th class="hide-md">Created</th>
                   <th class="hide-md">Last Solved</th>
                   <th class="hide-md">Last Revised</th>
-                  <th>Next Revision</th>
+                  <th class="sortable" data-sort="nextRevision" data-table="upcoming">Next Revision <span class="sort-arrow"></span></th>
                   <th class="col-act"></th>
                 </tr>
               </thead>
               <tbody id="upcoming-tbody"></tbody>
             </table>
           </div>
-          <div id="upcoming-empty" class="empty-state hidden">No upcoming revisions. Mark some questions as solved to start your revision cycle!</div>
+          <div id="upcoming-empty" class="empty-state hidden">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <p>Nothing coming up. Solve some questions to start your revision cycle!</p>
+          </div>
         </div>
+
       </main>
+
       <footer class="global-footer">
-        <p>Track &middot; Revise &middot; Master</p>
+        <p>DSA.Revise &mdash; Track · Revise · Master</p>
       </footer>
-    </div><!-- end .main-wrap -->
-  </div><!-- end .app-shell -->
+    </div>
+  </div>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-nav" id="mobile-nav">
+    <button class="mnav-item active" data-section="home">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="mnav-item" data-section="all">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
+      <span>All</span>
+    </button>
+    <button class="mnav-item" data-section="upcoming">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Upcoming</span>
+    </button>
+  </nav>
 
   <script src="Storage.js"></script>
   <script src="Logic.js"></script>

@@ -658,6 +658,7 @@ function doNotesBlurById(id, taId) {
 }
 
 // ── CUSTOM DELETE ──
+// ── CUSTOM DELETE ──
 function doDelete(id, source) {
   const q = getQuestions().find(q => q.id === id);
   if (!q) return;
@@ -672,6 +673,7 @@ function cancelDelete() {
   pendingDeleteSource = null;
   document.getElementById('delete-confirm-overlay').classList.add('hidden');
 }
+window.cancelDelete = cancelDelete; // Expose globally for HTML onclick
 
 function confirmDelete() {
   if (!pendingDeleteId) return;
@@ -684,10 +686,12 @@ function confirmDelete() {
   cancelDelete();
   refreshAfter(src);
 }
+window.confirmDelete = confirmDelete; // Expose globally for HTML onclick
 
 function handleDeleteOverlayClick(e) {
   if (e.target === document.getElementById('delete-confirm-overlay')) cancelDelete();
 }
+window.handleDeleteOverlayClick = handleDeleteOverlayClick; // Expose globally for HTML onclick
 
 // ── IMPORT ──
 function handleImportFile(event) {
